@@ -1,9 +1,13 @@
+const fs = require('fs');
 const path = require('path');
 
 const BUILD_DIR = path.resolve(__dirname, 'public');
 const APP_DIR = path.resolve(__dirname, 'src');
 
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const lessToJs = require('less-vars-to-js');
+
+const themeVariables = lessToJs(fs.readFileSync(path.join(__dirname, './src/theme/ant-default-vars.less'), 'utf8'));
 
 module.exports = {
   mode: 'development',
@@ -24,6 +28,9 @@ module.exports = {
         loader: 'babel-loader',
         options: {
           presets: ['env', 'react'],
+          plugins: [
+            ['import', { libraryName: 'antd', style: true }],
+          ],
         },
       },
       {
@@ -33,6 +40,10 @@ module.exports = {
           { loader: 'css-loader' },
           {
             loader: 'less-loader',
+            options: {
+              modifyVars: themeVariables,
+              javascriptEnabled: true,
+            },
           },
         ],
       },
